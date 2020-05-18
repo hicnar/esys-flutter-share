@@ -10,6 +10,7 @@ import androidx.core.content.FileProvider;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -67,11 +68,12 @@ public class EsysFlutterSharePlugin implements MethodCallHandler {
 
     private void file(Object arguments) {
         @SuppressWarnings("unchecked")
-        HashMap<String, String> argsMap = (HashMap<String, String>) arguments;
+        Map<String, String> argsMap = (HashMap<String, String>) arguments;
         String title = argsMap.get("title");
         String name = argsMap.get("name");
         String mimeType = argsMap.get("mimeType");
         String text = argsMap.get("text");
+        String subject = argsMap.get("subject");
 
         Context activeContext = _registrar.activeContext();
 
@@ -81,8 +83,10 @@ public class EsysFlutterSharePlugin implements MethodCallHandler {
         String fileProviderAuthority = activeContext.getPackageName() + PROVIDER_AUTH_EXT;
         Uri contentUri = FileProvider.getUriForFile(activeContext, fileProviderAuthority, file);
         shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
-        // add optional text
-        if (!text.isEmpty()) shareIntent.putExtra(Intent.EXTRA_TEXT, text);
+
+        if (text != null && !text.isEmpty()) shareIntent.putExtra(Intent.EXTRA_TEXT, text);
+        if (subject != null && !subject.isEmpty()) shareIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
+
         activeContext.startActivity(Intent.createChooser(shareIntent, title));
     }
 
@@ -111,7 +115,7 @@ public class EsysFlutterSharePlugin implements MethodCallHandler {
 
         shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, contentUris);
         // add optional text
-        if (!text.isEmpty()) shareIntent.putExtra(Intent.EXTRA_TEXT, text);
+        if (text != null && !text.isEmpty()) shareIntent.putExtra(Intent.EXTRA_TEXT, text);
         activeContext.startActivity(Intent.createChooser(shareIntent, title));
     }
 }
