@@ -64,14 +64,16 @@ class Share {
   }
 
   static Map<String, dynamic> _addRect(
-      Map<String, dynamic> argsMap, Rect sharePositionOrigin) {
-    if (sharePositionOrigin != null) {
-      argsMap['originX'] = sharePositionOrigin.left;
-      argsMap['originY'] = sharePositionOrigin.top;
-      argsMap['originWidth'] = sharePositionOrigin.width;
-      argsMap['originHeight'] = sharePositionOrigin.height;
-    }
-
-    return argsMap;
-  }
+      Map<String, dynamic> argsMap, Rect sharePositionOrigin) => Map.fromEntries({
+        ...argsMap.entries,
+          if (sharePositionOrigin != null)
+            ...
+            [
+              MapEntry('originX', sharePositionOrigin.left),
+              MapEntry('originY', sharePositionOrigin.top),
+              MapEntry('originWidth', sharePositionOrigin.width),
+              MapEntry('originHeight', sharePositionOrigin.height)
+            ]
+        }
+    );
 }
