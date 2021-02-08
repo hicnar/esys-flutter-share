@@ -38,18 +38,24 @@ public class SwiftEsysFlutterSharePlugin: NSObject, FlutterPlugin {
         let argsMap = arguments as! NSDictionary
         let name:String = argsMap.value(forKey: "name") as! String
         let text:String = argsMap.value(forKey: "text") as! String
+        let pluginDir:String = argsMap.value(forKey: "pluginDir") as! String
 
-        // load the file
-        let docsPath:String = NSSearchPathForDirectoriesInDomains(.cachesDirectory,.userDomainMask , true).first!;
-        let contentUri = NSURL(fileURLWithPath: docsPath).appendingPathComponent(name)
+        // load the file from the plugin directory
+        var docsPath:URL = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!;
+        
+        if (!pluginDir.isEmpty) {
+            docsPath.appendPathComponent(pluginDir, isDirectory: true);
+        }
+        
+        let contentUri = NSURL(fileURLWithPath: docsPath.absoluteString).appendingPathComponent(name)
 
         // prepare activity items
         var activityItems:[Any] = [contentUri!];
-        if(!text.isEmpty){
+        if (!text.isEmpty) {
             // add optional text
             activityItems.append(text);
         }
-        if (UIDevice.current.userInterfaceIdiom == .pad){
+        if (UIDevice.current.userInterfaceIdiom == .pad) {
            setupAndShow(activityItems: activityItems, argsMap: argsMap)
         } else {
           // set up activity view controller

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
@@ -23,21 +24,30 @@ class Share {
   }
 
   /// Sends a file to other apps.
-  static Future<void> file(
-      String title, String name, List<int> bytes, String mimeType, {String text = '', String subject = '', Rect sharePositionOrigin}) async {
+  static Future<void> file(String title, String name, List<int> bytes,
+    String mimeType, {String text = '', String subject = '',
+    String pluginDir = 'flutter_share', bool cleanupBefore = true,
+    Rect sharePositionOrigin}) async {
+
     Map argsMap = <String, String>{
       'title': '$title',
+      'pluginDir': pluginDir,
       'name': '$name',
       'mimeType': '$mimeType',
       'subject': '$subject',
       'text': '$text'
     };
 
-    final tempDir = await getTemporaryDirectory();
-    final file = await new File(join(tempDir.path, name)).create();
+    final workingDir = Directory(join((await getTemporaryDirectory()).path, pluginDir));
+
+    if (cleanupBefore && workingDir.existsSync()) {
+      workingDir.deleteSync(recursive: true);
+    }
+
+    final file = await File(join(workingDir.path, name)).create(recursive: true);
     await file.writeAsBytes(bytes);
     argsMap = _addRect(argsMap, sharePositionOrigin);
-    _channel.invokeMethod('file', argsMap);
+    return _channel.invokeMethod('file', argsMap);
   }
 
   /// Sends multiple files to other apps.

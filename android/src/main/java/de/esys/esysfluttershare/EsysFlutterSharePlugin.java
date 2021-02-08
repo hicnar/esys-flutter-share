@@ -69,6 +69,10 @@ public class EsysFlutterSharePlugin implements MethodCallHandler {
         activeContext.startActivity(Intent.createChooser(shareIntent, title));
     }
 
+    private String addPluginDir(String pluginDir) {
+      return (pluginDir != null && !pluginDir.isEmpty()) ? File.separator + pluginDir : "";
+    }
+
     private void file(Object arguments) {
         @SuppressWarnings("unchecked")
         Map<String, String> argsMap = (HashMap<String, String>) arguments;
@@ -76,13 +80,16 @@ public class EsysFlutterSharePlugin implements MethodCallHandler {
         String name = argsMap.get("name");
         String mimeType = argsMap.get("mimeType");
         String text = argsMap.get("text");
+        String pluginDir = argsMap.get("pluginDir");
         String subject = argsMap.get("subject");
 
         Context activeContext = _registrar.activeContext();
 
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.setType(mimeType);
-        File file = new File(activeContext.getCacheDir(), name);
+        String absPluginDir = activeContext.getCacheDir().getPath() + addPluginDir(pluginDir);
+
+        File file = new File(absPluginDir, name);
         String fileProviderAuthority = activeContext.getPackageName() + PROVIDER_AUTH_EXT;
         Uri contentUri = FileProvider.getUriForFile(activeContext, fileProviderAuthority, file);
         shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
