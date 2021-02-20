@@ -27,8 +27,23 @@ public class SwiftEsysFlutterSharePlugin: NSObject, FlutterPlugin {
         //// let title:String = argsMap.value(forKey: "title") as! String
         let argsMap = arguments as! NSDictionary
         let text:String = argsMap.value(forKey: "text") as! String
-        
-        setupAndShow(activityItems: [text], argsMap: argsMap)
+        let subject:String = argsMap.value(forKey: "subject") as! String
+
+        if (UIDevice.current.userInterfaceIdiom == .pad) {
+           setupAndShow(activityItems: [text], argsMap: argsMap, subject: subject)
+        } else {
+          // set up activity view controller
+          let activityViewController:UIActivityViewController = UIActivityViewController(activityItems: [text], applicationActivities: nil)
+
+          if (!subject.isEmpty) {
+              activityViewController.setValue(subject, forKey: "Subject")
+          }
+
+          // present the view controller
+          let controller = UIApplication.shared.keyWindow!.rootViewController
+          activityViewController.popoverPresentationController?.sourceView = controller?.view
+          controller?.present(activityViewController, animated: true, completion: nil)
+        }
     }
 
     func file(arguments:Any?) -> Void {
@@ -38,6 +53,7 @@ public class SwiftEsysFlutterSharePlugin: NSObject, FlutterPlugin {
         let argsMap = arguments as! NSDictionary
         let name:String = argsMap.value(forKey: "name") as! String
         let text:String = argsMap.value(forKey: "text") as! String
+        let subject:String = argsMap.value(forKey: "subject") as! String
         let pluginDir:String = argsMap.value(forKey: "pluginDir") as! String
 
         // load the file from the plugin directory
@@ -56,7 +72,7 @@ public class SwiftEsysFlutterSharePlugin: NSObject, FlutterPlugin {
             activityItems.append(text);
         }
         if (UIDevice.current.userInterfaceIdiom == .pad) {
-           setupAndShow(activityItems: activityItems, argsMap: argsMap)
+           setupAndShow(activityItems: activityItems, argsMap: argsMap, subject: subject)
         } else {
           // set up activity view controller
           let activityViewController:UIActivityViewController = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
@@ -76,6 +92,7 @@ public class SwiftEsysFlutterSharePlugin: NSObject, FlutterPlugin {
         let argsMap = arguments as! NSDictionary
         let names:[String] = argsMap.value(forKey: "names") as! [String]
         let text:String = argsMap.value(forKey: "text") as! String
+        let subject:String = argsMap.value(forKey: "subject") as! String
 
         // prepare activity items
         var activityItems:[Any] = [];
@@ -91,7 +108,7 @@ public class SwiftEsysFlutterSharePlugin: NSObject, FlutterPlugin {
             activityItems.append(text);
         }
         if (UIDevice.current.userInterfaceIdiom == .pad){
-           setupAndShow(activityItems: activityItems, argsMap: argsMap)
+           setupAndShow(activityItems: activityItems, argsMap: argsMap, subject: subject)
         } else {
           // set up activity view controller
           let activityViewController:UIActivityViewController = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
@@ -103,9 +120,14 @@ public class SwiftEsysFlutterSharePlugin: NSObject, FlutterPlugin {
         }
     }
 
-    private func setupAndShow(activityItems: [Any], argsMap: NSDictionary) {
-
+    private func setupAndShow(activityItems: [Any], argsMap: NSDictionary, subject: String) {
+        
         let activityViewController = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
+        
+        if (!subject.isEmpty) {
+            activityViewController.setValue(subject, forKey: "Subject")
+        }
+
         let controller = UIApplication.shared.keyWindow!.rootViewController
 
         if let popover = activityViewController.popoverPresentationController {

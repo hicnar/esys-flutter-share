@@ -57,16 +57,19 @@ public class EsysFlutterSharePlugin implements MethodCallHandler {
     private void text(Object arguments) {
         @SuppressWarnings("unchecked")
         HashMap<String, String> argsMap = (HashMap<String, String>) arguments;
-        String title = argsMap.get("title");
         String text = argsMap.get("text");
-        String mimeType = argsMap.get("mimeType");
+        String subject = argsMap.get("subject");
+        String title = argsMap.get("title");
 
         Context activeContext = _registrar.activeContext();
 
-        Intent shareIntent = new Intent(Intent.ACTION_SEND);
-        shareIntent.setType(mimeType);
+        Intent shareIntent = new Intent();
+        shareIntent.setAction(Intent.ACTION_SEND);
         shareIntent.putExtra(Intent.EXTRA_TEXT, text);
-        activeContext.startActivity(Intent.createChooser(shareIntent, title));
+        shareIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
+        shareIntent.setType("text/plain");
+        Intent chooserIntent = Intent.createChooser(shareIntent, title);
+        activeContext.startActivity(chooserIntent);
     }
 
     private String addPluginDir(String pluginDir) {

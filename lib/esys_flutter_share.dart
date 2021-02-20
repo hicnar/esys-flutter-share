@@ -2,22 +2,21 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
 
 class Share {
   static const MethodChannel _channel = const MethodChannel(
       'channel:github.com/orgs/esysberlin/esys-flutter-share');
 
   /// Sends a text to other apps.
-  static void text(String title, String text, String mimeType,
-      {Rect sharePositionOrigin}) {
+  static void text(String text, {String title, String subject,
+      Rect sharePositionOrigin}) {
     Map argsMap = <String, dynamic>{
       'title': '$title',
       'text': '$text',
-      'mimeType': '$mimeType'
+      'subject': '$subject'
     };
     argsMap = _addRect(argsMap, sharePositionOrigin);
     _channel.invokeMethod('text', argsMap);
