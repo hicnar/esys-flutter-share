@@ -11,7 +11,7 @@ class Share {
       'channel:github.com/orgs/esysberlin/esys-flutter-share');
 
   /// Sends a text to other apps.
-  static void text(String text, {String title, String subject,
+  static void text(String text, {String title='', String subject='',
       Rect sharePositionOrigin}) {
     Map argsMap = <String, dynamic>{
       'title': '$title',
